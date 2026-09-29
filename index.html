@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Cloud Files</title>
+<style>
+* {
+    box-sizing: border-box;
+}
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #06152b;
+    color: white;
+}
+.login-screen {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at 20% 20%, #1265c5 0%, transparent 35%), radial-gradient(circle at 80% 80%, #092c58 0%, transparent 40%), linear-gradient(135deg, #031126, #0a3b78);
+}
+.login-card {
+    width: 480px;
+    max-width: 90%;
+    padding: 45px;
+    border-radius: 28px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    text-align: center;
+}
+.logo {
+    width: 85px;
+    height: 85px;
+    margin: auto;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    background: linear-gradient(135deg, #2c9cff, #1552d4);
+    box-shadow: 0 15px 35px rgba(0,120,255,0.35);
+}
+.login-card h1 {
+    font-size: 38px;
+    margin: 25px 0 8px;
+}
+.login-card p {
+    color: #b9cce5;
+    font-size: 16px;
+}
+.password-box {
+    width: 100%;
+    margin-top: 30px;
+    position: relative;
+}
+.password-box input {
+    width: 100%;
+    padding: 17px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.25);
+    color: white;
+    outline: none;
+    font-size: 17px;
+}
+.password-box input:focus {
+    border-color: #43a5ff;
+    box-shadow: 0 0 20px rgba(50,150,255,0.25);
+}
+.login-button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 17px;
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    background: linear-gradient(135deg, #168cff, #1757db);
+    transition: 0.2s;
+}
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,130,255,0.35);
+}
+#error {
+    color: #ff7070;
+    min-height: 20px;
+    margin-top: 15px;
+}
+.app {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    background: radial-gradient(circle at 80% 0%, #124e91 0%, transparent 30%), #06152b;
+}
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    padding: 25px;
+    background: rgba(3,15,32,0.92);
+    border-right: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+}
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 45px;
+}
+.small-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #299cff, #1654d8);
+}
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.menu button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: #a9bdd6;
+    text-align: left;
+    font-size: 15px;
+    cursor: pointer;
+}
+.menu button:hover, .menu button.active {
+    background: rgba(40,140,255,0.15);
+    color: white;
+}
+.main {
+    margin-left: 250px;
+    padding: 35px;
+    min-height: 100vh;
+}
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+.topbar h1 {
+    margin: 0;
+    font-size: 32px;
+}
+.status {
+    padding: 10px 15px;
+    border-radius: 30px;
+    background: rgba(40,200,120,0.12);
+    color: #66e0a1;
+    font-size: 14px;
+}
+.storage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+.storage-card {
+    padding: 28px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(26,122,220,0.35), rgba(255,255,255,0.07));
+    border: 1px solid rgba(255,255,255,0.12);
+}
+.storage-card h2 {
+    margin-top: 0;
+    font-size: 20px;
+}
+.storage-number {
+    font-size: 38px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+.progress {
+    width: 100%;
+    height: 10px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.12);
+}
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #31a5ff, #2261ff);
+}
+.upload-area {
+    padding: 35px;
+    border-radius: 24px;
+    border: 2px dashed rgba(90,170,255,0.35);
+    background: rgba(255,255,255,0.035);
+    text-align: center;
+    margin-bottom: 30px;
+}
+.upload-icon {
+    font-size: 55px;
+    margin-bottom: 10px;
+}
+.upload-area h2 {
+    margin: 5px;
+}
+.upload-area p {
+    color: #9eb4ce;
+}
+.file-select {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 14px 25px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #178cff, #1655d7);
+    cursor: pointer;
+    font-weight: bold;
+}
+.file-select input {
+    display: none;
+}
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.section-title h2 {
+    margin: 0;
+}
+.upload-selected {
+    padding: 11px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #168cff;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+.selected-list {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 35px;
+}
+.selected-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.file-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+.file-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    background: rgba(40,140,255,0.15);
+    font-size: 22px;
+}
+.file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.file-size {
+    color: #829bb8;
+    font-size: 13px;
+    margin-top: 4px;
+}
+.remove-button {
+    border: none;
+    background: rgba(255,70,70,0.12);
+    color: #ff7777;
+    padding: 9px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+.remove-button:hover {
+    background: rgba(255,70,70,0.25);
+}
+.files-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+}
+.file-card {
+    padding: 22px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: 0.2s;
+}
+.file-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(70,160,255,0.4);
+}
+.file-card-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.file-card-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(30,140,255,0.15);
+    font-size: 25px;
+}
+.file-card-name {
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.file-card-info {
+    color: #8da5c0;
+    font-size: 13px;
+}
+.file-actions {
+    display: flex;
+    gap: 10px;
+}
+.download-button, .delete-button {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.download-button {
+    background: rgba(30,140,255,0.15);
+    color: #67b9ff;
+}
+.delete-button {
+    background: rgba(255,70,70,0.12);
+    color: #ff7777;
+}
+.download-button:hover {
+    background: rgba(30,140,255,0.3);
+}
+.delete-button:hover {
+    background: rgba(255,70,70,0.25);
+}
+.empty {
+    padding: 40px;
+    text-align: center;
+    color: #8198b1;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.03);
+}
+.logout {
+    position: absolute;
+    bottom: 25px;
+    left: 25px;
+    right: 25px;
+    padding: 13px;
+    border: none;
+    border-radius: 11px;
+    background: rgba(255,70,70,0.10);
+    color: #ff8585;
+    cursor: pointer;
+}
+@media(max-width: 800px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+    .logout {
+        position: relative;
+        left: 0;
+        bottom: 0;
+        margin-top: 30px;
+    }
+    .main {
+        margin-left: 0;
+        padding: 20px;
+    }
+    .storage {
+        grid-template-columns: 1fr;
+    }
+    .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+    <div class="login-card">
+        <div class="logo">☁️</div>
+        <h1>School Files</h1>
+        <p>Private document storage</p>
+        <div class="password-box">
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        <button class="login-button" onclick="login()">🔐 Login</button>
+        <div id="error"></div>
+    </div>
+</div>
+
+<div class="app" id="app">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="small-logo">☁️</div>
+            School Files
+        </div>
+        <div class="menu">
+            <button class="active">🏠 Dashboard</button>
+            <button>📁 My Documents</button>
+            <button>⭐ Favorites</button>
+        </div>
+        <button class="logout" onclick="logout()">🚪 Logout</button>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <h1>My Documents</h1>
+                <p style="color:#8ea8c4;">Manage your authorized school files</p>
+            </div>
+            <div class="status">● Secure session</div>
+        </div>
+
+        <div class="storage">
+            <div class="storage-card">
+                <h2>☁️ Storage</h2>
+                <div class="storage-number"><span id="fileCount">0</span> files</div>
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p style="color:#91a9c2;">Current browser storage</p>
+            </div>
+            <div class="storage-card">
+                <h2>📊 Activity</h2>
+                <div class="storage-number"><span id="activityCount">0</span></div>
+                <p style="color:#91a9c2;">Files currently selected</p>
+            </div>
+        </div>
+
+        <div class="upload-area">
+            <div class="upload-icon">☁️</div>
+            <h2>Add Documents</h2>
+            <p>Select one or multiple files from this computer.</p>
+            <label class="file-select">
+                📂 Select Files
+                <input type="file" id="fileInput" multiple onchange="addFiles()">
+            </label>
+        </div>
+
+        <div class="section-title">
+            <h2>Selected Files</h2>
+            <button class="upload-selected" onclick="uploadDemo()">📤 Upload</button>
+        </div>
+        <div class="selected-list" id="selectedList">
+            <div class="empty">No files selected.</div>
+        </div>
+
+        <div class="section-title">
+            <h2>☁️ Stored Files</h2>
+        </div>
+        <div class="files-container" id="filesContainer">
+            <div class="empty">No stored files yet.</div>
+        </div>
+    </main>
+</div>
+
+<script>
+const PASSWORD = "Subir5892";
+let selectedFiles = [];
+let storedFiles = JSON.parse(localStorage.getItem("schoolStoredFiles")) || [];
+
+window.onload = function() {
+    renderStoredFiles();
+};
+
+function login() {
+    const password = document.getElementById("password").value;
+    const error = document.getElementById("error");
+
+    if (password === PASSWORD) {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        error.textContent = "";
+    } else {
+        error.textContent = "❌ Incorrect password.";
+    }
+}
+
+function logout() {
+    document.getElementById("app").style.display = "none";
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("password").value = "";
+}
+
+function addFiles() {
+    const input = document.getElementById("fileInput");
+    for (const file of input.files) {
+        selectedFiles.push(file);
+    }
+    input.value = "";
+    renderSelectedFiles();
+}
+
+function renderSelectedFiles() {
+    const list = document.getElementById("selectedList");
+    list.innerHTML = "";
+
+    if (selectedFiles.length === 0) {
+        list.innerHTML = `<div class="empty">No files selected.</div>`;
+        updateCounters();
+        return;
+    }
+
+    selectedFiles.forEach((file, index) => {
+        const div = document.createElement("div");
+        div.className = "selected-file";
+        div.innerHTML = `
+            <div class="file-left">
+                <div class="file-icon">📄</div>
+                <div>
+                    <div class="file-name">${escapeHTML(file.name)}</div>
+                    <div class="file-size">${formatBytes(file.size)}</div>
+                </div>
+            </div>
+            <button class="remove-button" onclick="removeSelected(${index})">❌ Remove</button>
+        `;
+        list.appendChild(div);
+    });
+    updateCounters();
+}
+
+function removeSelected(index) {
+    selectedFiles.splice(index, 1);
+    renderSelectedFiles();
+}
+
+function uploadDemo() {
+    if (selectedFiles.length === 0) {
+        alert("Please select files first.");
+        return;
+    }
+
+    let processedCount = 0;
+    selectedFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const fileData = {
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                data: event.target.result
+            };
+            storedFiles.push(fileData);
+            processedCount++;
+
+            if (processedCount === selectedFiles.length) {
+                localStorage.setItem("schoolStoredFiles", JSON.stringify(storedFiles));
+                selectedFiles = [];
+                renderSelectedFiles();
+                renderStoredFiles();
+                alert("Files successfully saved!");
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function renderStoredFiles() {
+    const container = document.getElementById("filesContainer");
+    container.innerHTML = "";
+
+    if (storedFiles.length === 0) {
+        container.innerHTML = `<div class="empty">No stored files yet.</div>`;
+        updateCounters();
+        return;
+    }
+
+    storedFiles.forEach((file, index) => {
+        const card = document.createElement("div");
+        card.className = "file-card";
+        card.innerHTML = `
+            <div class="file-card-top">
+                <div class="file-card-icon">📄</div>
+                <div>
+                    <div class="file-card-name">${escapeHTML(file.name)}</div>
+                    <div class="file-card-info">${formatBytes(file.size)}</div>
+                </div>
+            </div>
+            <div class="file-actions">
+                <button class="download-button" onclick="downloadFile(${index})">📥 Download</button>
+                <button class="delete-button" onclick="deleteFile(${index})">🗑️ Delete</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    updateCounters();
+}
+
+function downloadFile(index) {
+    const file = storedFiles[index];
+    const link = document.createElement("a");
+    link.href = file.data;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+function deleteFile(index) {
+    const file = storedFiles[index];
+    const answer = confirm("Delete " + file.name + " from storage?");
+    if (!answer) return;
+
+    storedFiles.splice(index, 1);
+    localStorage.setItem("schoolStoredFiles", JSON.stringify(storedFiles));
+    renderStoredFiles();
+}
+
+function updateCounters() {
+    document.getElementById("fileCount").textContent = storedFiles.length;
+    document.getElementById("activityCount").textContent = selectedFiles.length;
+    const percentage = Math.min(storedFiles.length * 10, 100);
+    document.getElementById("progressBar").style.width = percentage + "%";
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return "0 Bytes";
+    const units = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + " " + units[i];
+}
+
+function escapeHTML(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+
+</body>
+</html>
